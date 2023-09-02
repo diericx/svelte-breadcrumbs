@@ -72,7 +72,7 @@ Here is an example:
 </script>
 ```
 
-### Types
+## Types
 
 ```ts
 export type Crumb = {
@@ -82,11 +82,13 @@ export type Crumb = {
 };
 ```
 
-### Full Component Docs
+## Full Component Docs
 
-#### Breadcrumbs
+## Breadcrumbs
 
 This component will provide an array of `Crum`s to a single slot. The final `Crum` will never have a URL as it is the current page.
+
+### Props
 
 `relPathToRoutes: string`
 
@@ -108,9 +110,11 @@ A list of `Crum`s that will override/bypass any breadcrumb generation via routes
 
 Each title of the generated `Crum` items will pass through this function. By default it will add spaces and capitalize (e.g. `myTodos` -> `My Todos`).
 
-#### BreadcrumbTitle
+## BreadcrumbTitle
 
 Attempts to generate a breadcrum title by searching the cooresponding route for data.
+
+### Props
 
 `crumb: Crumb`
 
