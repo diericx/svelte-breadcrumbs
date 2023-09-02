@@ -1,6 +1,6 @@
 # Svelte-Breadcrumbs
 
-Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs. When navigating to a route such as this:
+Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs. For example, when navigating to a route such as this:
 
 Route id: `/todos/[id]/edit`
 
@@ -10,13 +10,22 @@ You may want more meaningful data in the breadcrumbs, such as converting an ID t
 
 `Home / Todos / My Todo / Edit`
 
-For each breadcrumb item Svelte-Breadcrumbs will search for a Svelte file at the cooresponding route and read the value of an exported string or getter function. The data is collected in the following order of priority:
+For each value in the route id (e.g. `/todos/[id]/edit`) a breadcrumb item is created. To generate the title of each breadcrum item Svelte-Breadcrumbs will attempt to import the module of the `.svelte` file in the cooresponding directory and access a constant string `pageTitle` or getter function `getPageTitle` that was exported. The getter function is applied to the current page's data.
+
+The title is generated with the following priority, each one acting as a fallback for the former:
 
 1. Page data `crumbs` property which overrides the entire `crumbs` array
-2. `pageTitle: string` variable or `getPageTitle(data: any) -> string` function in the svelte page's module context
-3. The value in the URL route path
+2. `pageTitle: string` variable in the svelte page's module context
+3. `getPageTitle(data: any) -> string` function in the svelte page's module context
+4. The value in the original URL route path
 
 ## Usage
+
+### Install
+
+```bash
+$ npm i svelte-breadcrumbs
+```
 
 ### Setting up the Breadcrumb component
 
@@ -61,16 +70,18 @@ The `BreadcrumbTitle` component will be importing your Svlete components based o
 - `pageTitle: string`
 - `getPageTitle: (data: any) -> string`
 
-The latter will get the value of `$page.data` passed through (see the `BreadcrumbTitle` usage above).
+`getPageTitle` will receive the value of `$page.data` passed through (see the `BreadcrumbTitle` usage above).
 
 Here is an example:
 
 ```svelte
 <script lang="ts">
+  // Getter function
   export function getPageTitle(data: any) {
-    return data.todo.name;
+    // When this is undefined it will fall back to the value in the route (in this case the todo id for the route /todos/1/edit)
+    return data.todo?.name;
   }
-  // or
+  // Or a constant
   export const pageTitle = 'Random Todo';
 </script>
 ```
