@@ -7,6 +7,11 @@
   export let routeId: string | null;
   export let url: URL;
   export let crumbs: Crumb[] | undefined = undefined;
+  export function titleSanitizer(title: string) {
+    return title
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase());
+  }
 
   $: _crumbs = [] as Crumb[];
   $: {
@@ -35,9 +40,7 @@
           // Last crumb gets no url as it is the current page
           url: i == paths.length - 1 ? undefined : completeUrl,
           route: completeRoute + "+page.svelte",
-          title: path
-            .replace(/([A-Z])/g, " $1")
-            .replace(/^./, (str) => str.toUpperCase()),
+          title: titleSanitizer(path),
         });
       }
       // Force trigger an update
@@ -49,7 +52,7 @@
         let path = paths[i];
         completeUrl += `/${path}`;
         _crumbs.push({
-          title: path,
+          title: titleSanitizer(path),
           url: i == paths.length - 1 ? undefined : completeUrl,
         });
       }

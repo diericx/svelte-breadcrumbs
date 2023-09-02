@@ -1,15 +1,15 @@
 # Svelte-Breadcrumbs
 
-Svelte-Breadcrumbs solves the annoying problem of generating meaningful breadcrumbs for routes. When navigating to a route such as this:
+Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs. When navigating to a route such as this:
 
 Route id: `/todos/[id]/edit`
 Route: `/todos/1/edit`
 
-You may want more meaningful data in the breadcrumbs like so:
+You may want more meaningful data in the breadcrumbs:
 
 `Home / Todos / My Todo / Edit`
 
-Svelte-Breadcrumbs will pick up on constant strings or dynamic functions written in your page Svelte files to generate crumbs. The data is collected in the following order of priority:
+For each breadcrumb item Svelte-Breadcrumbs will search for a Svelte file at the cooresponding route and read the value of an exported string or getter function. The data is collected in the following order of priority:
 
 1. Page data `crumbs` property which overrides the entire `crumbs` array
 2. `pageTitle: string` variable or `getPageTitle(data: any) -> string` function exported from the respective svelte page
@@ -71,3 +71,55 @@ Here is an example:
   export const pageTitle = 'Random Todo';
 </script>
 ```
+
+### Types
+
+```ts
+export type Crumb = {
+  title?: string;
+  url?: string;
+  route?: string;
+};
+```
+
+### Full Component Docs
+
+#### Breadcrumbs
+
+This component will provide an array of `Crum`s to a single slot. The final `Crum` will never have a URL as it is the current page.
+
+`relPathToRoutes: string`
+
+The relative path to the `routes/` folder from the file where `Breadcrumbs` is being rendered. This is used when generating the path for each breadcrumb item and is consumed byt the `BreadcrumbItem` component when it tries to import a Svelte file in the cooresponding location.
+
+`routeId: string`
+
+Route id for the current page. In Sveltekit this is `$page.route.id`.
+
+`url: string`
+
+URL for the current page. Used to generate the url that each breadcrumb should link to when clicked on. In SvelteKit this is `$page.url`.
+
+`crumbs: Crumb[]`
+
+A list of `Crum`s that will override/bypass any breadcrumb generation via routes. In SvelteKit if you pass `$page.data.crumbs` or something similar you will be able to override any bread crumbs via page loads.
+
+`titleSanitizer(title: string) -> string`
+
+Each title of the generated `Crum` items will pass through this function. By default it will add spaces and capitalize (e.g. `myTodos` -> `My Todos`).
+
+#### BreadcrumbTitle
+
+Attempts to generate a breadcrum title by searching the cooresponding route for data.
+
+`crumb: Crumb`
+
+The crummy little item to be rendered
+
+`routeModules: Record<string, () => Promise<unknown>>`
+
+The files imported via a glob pattern (`import.meta.glob(path: string)`)
+
+`pageData: any`
+
+Page Data to pass through to the `getPageTitle` function living in a route's `page.svelte` file
