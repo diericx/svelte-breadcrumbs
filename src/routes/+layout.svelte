@@ -1,12 +1,15 @@
-<script>
+<script lang="ts">
   import { page } from "$app/stores";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
   import BreadcrumbTitle from "$lib/components/BreadcrumbTitle.svelte";
-
-  const routeModules = import.meta.glob("../routes/**/*.svelte");
 </script>
 
-<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs>
+<Breadcrumbs
+  url={$page.url}
+  routeId={$page.route.id}
+  let:crumbs
+  let:routeModules
+>
   <div>
     <span><a href="/">Home</a></span>
     {#each crumbs as c}

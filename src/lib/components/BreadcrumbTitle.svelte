@@ -1,34 +1,45 @@
 <script lang="ts">
   import type { Crumb } from "$lib/crumb.js";
+  import type { ModuleData } from "$lib/types.js";
 
   export let crumb: Crumb;
-  export let routeModules: Record<string, () => Promise<unknown>>;
+  export let routeModules: Record<
+    string,
+    (() => Promise<ModuleData>) | ModuleData
+  >;
   export let pageData: any;
+
+  $: _module = routeModules[crumb.route];
 
   function logError(e: any) {
     console.error(e);
     return "";
   }
 
-  function importModule(path: string): any {
-    console.log(path);
-    return routeModules[path]();
+  function renderModuleTitle(module: any) {
+    if (module.pageTitle) {
+      return module.pageTitle;
+    }
+    if (module.getPageTitle) {
+      return module.getPageTitle(pageData);
+    }
+    return crumb.title;
   }
 </script>
 
 {#if crumb.route}
-  {#await importModule(crumb.route) then result}
-    {#if result.pageTitle}
-      {result.pageTitle}
-    {:else if result.getPageTitle}
-      {result.getPageTitle(pageData)}
+  {#if _module}
+    {#if typeof _module == "function"}
+      {#await _module() then result}
+        {renderModuleTitle(result)}
+      {:catch error}
+        {logError(error)}
+        {crumb.title}
+      {/await}
     {:else}
-      {crumb.title}
+      {renderModuleTitle(_module)}
     {/if}
-  {:catch error}
-    {logError(error)}
-    {crumb.title}
-  {/await}
+  {/if}
 {:else}
   {crumb.title}
 {/if}

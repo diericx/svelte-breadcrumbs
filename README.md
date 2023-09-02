@@ -1,12 +1,12 @@
 # Svelte-Breadcrumbs
 
-Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs by levering Svelte's directory structure and (Module Context Exports)[https://learn.svelte.dev/tutorial/module-exports].
+Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs by levering Svelte's directory structure and [Module Context Exports](https://learn.svelte.dev/tutorial/module-exports).
 
 For example, when navigating to a route such as `/todos/[id]/edit` with the URL Pathname being `/todos/1/edit` you can immediately generate the breadcrumb `todos > 1 > edit`.
 
-What if you wanted that id to be the name of the todo itself? The crux of the issue lies in the fact that we are currently on the `/todos/[i]/edit` page, so any breadcrumb ui generated in `/todos/[i]/+page.svelte` or breadcrumb data returned in `/todos/[id]/+page.server.ts` will not be immediately available. Without some sort of data transfer or higher level organization we will need to regenerate the breadcrumb for each route.
+What if you wanted that id to be the name of the todo itself? The crux of the issue lies in the fact that we are currently on the `/todos/[i]/edit` page, so any breadcrumb ui generated in `/todos/[i]/+page.svelte` or breadcrumb data returned in `/todos/[id]/+page.server.ts` will not be immediately available. Without some sort of data transfer or higher level organization we will need to manually construct the breadcrumb for each route.
 
-With Svelte-Breadcrumbs, the route id is first split (e.g. `/todos/[id]/edit` -> `['todos', '[id]', '/edit']`) giving us the directory for each route. We then attempt to import the module of the `.svelte` file in the cooresponding directory and access a constant string `pageTitle` or getter function `getPageTitle` that was exported. The getter function is called with the current page's data passed as a parameter.
+With Svelte-Breadcrumbs, the route id is first split (e.g. `/todos/[id]/edit` -> `['todos', '[id]', '/edit']`) giving us the directory for each route. We then import the `+page.svelte` file from the cooresponding directory and access a constant string `pageTitle` or getter function `getPageTitle` that was exported. The getter function is called with the current page's data passed as a parameter.
 
 The title is then generated with the following priority, each one acting as a fallback for it's greater:
 
@@ -15,7 +15,7 @@ The title is then generated with the following priority, each one acting as a fa
 3. `getPageTitle(data: any) -> string` function in the svelte page's module context
 4. The value in the original URL route path
 
-This library allows the code defining the breadcrum title to exist within the view itself. There is very little code repetition as this library attempts to generate/glean as much as it can from the url path.
+This library allows the breadcrum title definition to exist within the view itself. There is very little code repetition as this library attempts to generate/glean as much as it can from the url path.
 
 The getter functions also have access to the `PageData` types, so they can be type safe with the cooresponding load function so the developer can know exactly what data is accessible!
 
@@ -34,12 +34,6 @@ $ npm i svelte-breadcrumbs
 In `+layout.svelte`:
 
 ```svelte
-<script lang="ts">
-  // Import the route modules using a glob import. This is necessary because
-  // we can't dynamically import files with template strings or non-literals
-  const routeModules = import.meta.glob('../routes/**/*.svelte');
-</script>
-
 <!--
 Add the `Breadcrumbs` component and feed in the current page url and the route id while grabbing the crumbs variable.
 -->

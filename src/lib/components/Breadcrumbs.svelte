@@ -1,8 +1,10 @@
 <script lang="ts">
   import type { Crumb } from "$lib/crumb.js";
+  import type { ModuleData } from "$lib/types.js";
+  import { onMount } from "svelte";
 
   // Relative path to the routes folder for the glob import
-  export let relPathToRoutes: string = "./";
+  export let relPathToRoutes: string = "/src/routes/";
   // The route from the routers perspective, e.g. $page.route.id
   export let routeId: string | null;
   export let url: URL;
@@ -12,8 +14,24 @@
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase());
   }
+  export let routeModules: Record<
+    string,
+    (() => Promise<ModuleData>) | ModuleData
+  > = {};
+  export let shouldImportRouteModules = true;
 
-  $: _crumbs = [] as Crumb[];
+  // If enabled, import the modules for all svelte files
+  onMount(async () => {
+    if (shouldImportRouteModules) {
+      const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
+      for (const [key, value] of Object.entries(_routeModules)) {
+        const module = (await value()) as ModuleData;
+        routeModules[key] = module;
+      }
+    }
+  });
+
+  let _crumbs = [] as Crumb[];
   $: {
     _crumbs = [] as Crumb[];
     if (crumbs != undefined) {
@@ -62,4 +80,4 @@
   }
 </script>
 
-<slot crumbs={_crumbs} />
+<slot crumbs={_crumbs} {routeModules} />
