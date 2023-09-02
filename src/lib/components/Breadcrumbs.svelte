@@ -6,11 +6,14 @@
   // The route from the routers perspective, e.g. $page.route.id
   export let routeId: string | null;
   export let url: URL;
+  export let crumbs: Crumb[] | undefined = undefined;
 
-  let crumbs: Crumb[] = [];
+  $: _crumbs = [] as Crumb[];
   $: {
-    crumbs = [];
-    if (routeId) {
+    _crumbs = [] as Crumb[];
+    if (crumbs != undefined) {
+      _crumbs = [...crumbs];
+    } else if (routeId) {
       // The next best case would be to parse the source route and import the
       // page titles from each page.
       let completeUrl = "";
@@ -39,26 +42,26 @@
         };
 
         completeRoute += "/";
-        crumbs.push(crumb);
+        _crumbs.push(crumb);
       }
 
       // Force trigger an update
-      crumbs = [...crumbs];
+      _crumbs = [..._crumbs];
     } else {
       let completeUrl = "";
       const paths = url.pathname.split("/").filter((p) => p != "");
       for (let i = 0; i < paths.length; i++) {
         let path = paths[i];
         completeUrl += `/${path}`;
-        crumbs.push({
+        _crumbs.push({
           title: path,
           url: i == paths.length - 1 ? undefined : completeUrl,
         });
       }
 
-      crumbs = [...crumbs];
+      _crumbs = [..._crumbs];
     }
   }
 </script>
 
-<slot {crumbs} />
+<slot crumbs={_crumbs} />
