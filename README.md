@@ -53,7 +53,7 @@ In `+layout.svelte`:
 
 ### Customizing route titles
 
-The `BreadcrumbItems` component will be importing your Svlete components based on the route id and will be looking for the following exported variables in the [Module Context](https://learn.svelte.dev/tutorial/module-exports):
+The `BreadcrumbTitle` component will be importing your Svlete components based on the route id and will be looking for the following exported variables in the [Module Context](https://learn.svelte.dev/tutorial/module-exports):
 
 - `pageTitle: string`
 - `getPageTitle: (data: any) -> string`
@@ -86,13 +86,13 @@ export type Crumb = {
 
 ## Breadcrumbs
 
-This component will provide an array of `Crum`s to a single slot. The final `Crum` will never have a URL as it is the current page.
+This component will provide an array of `Crumb`s to a single slot. The final `Crumb` will never have a URL as it is the current page.
 
 ### Props
 
 `relPathToRoutes: string`
 
-The relative path to the `routes/` folder from the file where `Breadcrumbs` is being rendered. This is used when generating the path for each breadcrumb item and is consumed byt the `BreadcrumbItem` component when it tries to import a Svelte file in the cooresponding location.
+The relative path to the `routes/` folder from the file where `Breadcrumbs` is being rendered. This is used when generating the path for each breadcrumb item and is consumed by the `BreadcrumbTitle` component when it tries to import a Svelte file in the cooresponding location.
 
 `routeId: string`
 
@@ -108,17 +108,17 @@ A list of `Crum`s that will override/bypass any breadcrumb generation via routes
 
 `titleSanitizer(title: string) -> string`
 
-Each title of the generated `Crum` items will pass through this function. By default it will add spaces and capitalize (e.g. `myTodos` -> `My Todos`).
+Each title of the generated `Crumb` items will pass through this function. By default it will add spaces and capitalize (e.g. `myTodos` -> `My Todos`).
 
 ## BreadcrumbTitle
 
-Attempts to generate a breadcrum title by searching the cooresponding route for data.
+Attempts to generate a breadcrumb title by searching the cooresponding route for data.
 
 ### Props
 
 `crumb: Crumb`
 
-The crummy little item to be rendered
+The crumby little item to be rendered
 
 `routeModules: Record<string, () => Promise<unknown>>`
 
