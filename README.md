@@ -4,7 +4,7 @@ Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs. For example
 
 Route id: `/todos/[id]/edit`
 
-Route: `/todos/1/edit`
+URL Pathname: `/todos/1/edit`
 
 You may want more meaningful data in the breadcrumbs, such as converting an ID to a name:
 
@@ -18,6 +18,12 @@ The title is generated with the following priority, each one acting as a fallbac
 2. `pageTitle: string` variable in the svelte page's module context
 3. `getPageTitle(data: any) -> string` function in the svelte page's module context
 4. The value in the original URL route path
+
+This library allows the code defining the breadcrum title to exist within the view it is defined for. There is also very little code repetition as this library attempts to generate/glean as much as it can. The alternative of defining a breadcrumb list for each route is averted.
+
+The getter functions also have access to the `PageData` types, so they can be type safe with the cooresponding load function so the developer can know exactly what data is accessible!
+
+The major drawback I see is that the glob import may be inefficient.
 
 ## Usage
 
@@ -76,6 +82,9 @@ Here is an example:
 
 ```svelte
 <script lang="ts">
+  // Use PageData so we can have type safety in the getter function
+  import type { PageData } from "./$types";
+
   // Getter function
   export function getPageTitle(data: any) {
     // When this is undefined it will fall back to the value in the route (in this case the todo id for the route /todos/1/edit)

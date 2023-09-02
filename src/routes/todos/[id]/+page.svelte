@@ -1,14 +1,14 @@
 <script context="module" lang="ts">
+  import type { PageData } from "./$types";
+
   // You can set the page title with a function that will be given
   // data from the component in the layout
-  export function getPageTitle(pageData: any) {
-    return pageData.todo?.name;
+  export function getPageTitle(pageData: PageData) {
+    return pageData.todo.name;
   }
 </script>
 
 <script lang="ts">
-  import type { PageData } from "./$types";
-
   export let data: PageData;
   const { todo } = data;
 </script>
