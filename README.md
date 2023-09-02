@@ -3,16 +3,17 @@
 Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs. When navigating to a route such as this:
 
 Route id: `/todos/[id]/edit`
+
 Route: `/todos/1/edit`
 
-You may want more meaningful data in the breadcrumbs:
+You may want more meaningful data in the breadcrumbs, such as converting an ID to a name:
 
 `Home / Todos / My Todo / Edit`
 
 For each breadcrumb item Svelte-Breadcrumbs will search for a Svelte file at the cooresponding route and read the value of an exported string or getter function. The data is collected in the following order of priority:
 
 1. Page data `crumbs` property which overrides the entire `crumbs` array
-2. `pageTitle: string` variable or `getPageTitle(data: any) -> string` function exported from the respective svelte page
+2. `pageTitle: string` variable or `getPageTitle(data: any) -> string` function in the svelte page's module context
 3. The value in the URL route path
 
 ## Usage
@@ -21,20 +22,22 @@ For each breadcrumb item Svelte-Breadcrumbs will search for a Svelte file at the
 
 In `+layout.svelte`:
 
-1. Import the route modules using a glob import. This is necessary due to the fact that we can't dynamically import files in components.
-
-2. Add the `Breadcrumbs` component and feed in the current page url and the route id while grabbing the crumbs variable.
-
-3. Loop over the generated crumbs array and use the `BreadcrumbTitle` component to generate your breadcrumb titles.
-
-```typescript
+```svelte
 <script lang="ts">
+  // Import the route modules using a glob import. This is necessary because
+  // we can't dynamically import files with template strings or non-literals
   const routeModules = import.meta.glob('../routes/**/*.svelte');
 </script>
 
+<!--
+Add the `Breadcrumbs` component and feed in the current page url and the route id while grabbing the crumbs variable.
+-->
 <Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs>
   <div>
     <span><a href="/">Home</a></span>
+    <!--
+    Loop over the generated crumbs array and use the `BreadcrumbTitle` component to generate your breadcrumb titles.
+    -->
     {#each crumbs as c}
       <span>/</span>
       <span>
