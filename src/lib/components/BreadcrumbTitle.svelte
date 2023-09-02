@@ -20,8 +20,9 @@
     if (module.pageTitle) {
       return module.pageTitle;
     }
+    // Fall back to crumb title if the function returns undefined
     if (module.getPageTitle) {
-      return module.getPageTitle(pageData);
+      return module.getPageTitle(pageData) || crumb.title;
     }
     return crumb.title;
   }
