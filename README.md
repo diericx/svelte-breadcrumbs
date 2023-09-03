@@ -100,7 +100,7 @@ The `BreadcrumbTitle` component will have access to your Svlete components based
 Here is an example:
 
 ```svelte
-<script lang="ts">
+<script context="module" lang="ts">
   // Getter function
   export function getPageTitle(data: any) {
     // When this is undefined it will fall back to the value in the route (in this case the todo id for the route /todos/1/edit)
