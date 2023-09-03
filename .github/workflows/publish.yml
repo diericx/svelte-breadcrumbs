@@ -1,0 +1,23 @@
+name: Publish Package
+
+on:
+  push:
+    branches: [master]
+    tags: v[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+  publish:
+    name: Publish NPM Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          registry-url: "https://registry.npmjs.org"
+      - run: npm run package
+      - run: npm run prepublishOnly
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
