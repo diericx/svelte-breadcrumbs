@@ -16,6 +16,7 @@ jobs:
         with:
           node-version: "18.x"
           registry-url: "https://registry.npmjs.org"
+      - run: npm i svelte-kit
       - run: npm run package
       - run: npm run prepublishOnly
       - run: npm publish
