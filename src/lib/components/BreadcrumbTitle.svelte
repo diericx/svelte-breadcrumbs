@@ -40,6 +40,8 @@
     {:else}
       {renderModuleTitle(_module)}
     {/if}
+  {:else}
+    {crumb.title}
   {/if}
 {:else}
   {crumb.title}
