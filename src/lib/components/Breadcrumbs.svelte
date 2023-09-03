@@ -20,13 +20,17 @@
   > = {};
   export let shouldImportRouteModules = true;
 
-  // If enabled, import the modules for all svelte files
   onMount(async () => {
+    // If enabled, import the modules for all svelte files
     if (shouldImportRouteModules) {
       const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
       for (const [key, value] of Object.entries(_routeModules)) {
         const module = (await value()) as ModuleData;
-        routeModules[key] = module;
+        // Only store the info we need to cut down on memory usage
+        routeModules[key] = {
+          pageTitle: module.pageTitle,
+          getPageTitle: module.getPageTitle,
+        };
       }
     }
   });

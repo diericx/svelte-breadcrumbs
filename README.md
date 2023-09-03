@@ -1,12 +1,12 @@
 # Svelte-Breadcrumbs
 
-Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs by levering Svelte's directory structure and [Module Context Exports](https://learn.svelte.dev/tutorial/module-exports).
+Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs by leveraging Svelte's directory structure and [Module Context Exports](https://learn.svelte.dev/tutorial/module-exports).
 
 For example, when navigating to a route such as `/todos/[id]/edit` with the URL Pathname being `/todos/1/edit` you can immediately generate the breadcrumb `todos > 1 > edit`.
 
 What if you wanted the id to be the name of the todo itself? The crux of this issue lies in the fact that we are currently on the `/todos/[i]/edit` page, so any breadcrumb ui elements generated in `/todos/[i]/+page.svelte` or breadcrumb data returned in `/todos/[id]/+page.server.ts` will not be immediately available. Without some sort of data sharing or higher level organization we will need to manually construct the breadcrumb list for each route.
 
-With Svelte-Breadcrumbs, the route id is first split (e.g. `/todos/[id]/edit` -> `['todos', '[id]', 'edit']`) giving us the directory for each route. We then import the `+page.svelte` file from the cooresponding directory and access a constant string `pageTitle` or getter function `getPageTitle` that was exported. The getter function is called with the current page's data passed in as a parameter.
+With Svelte-Breadcrumbs, the route id is first split (e.g. `/todos/[id]/edit` -> `['todos', '[id]', 'edit']`) giving us the directory for each route. We then import the `+page.svelte` file from the corresponding directory and access a constant string `pageTitle` or getter function `getPageTitle` that was exported. The getter function is called with the current page's data passed in as a parameter.
 
 The title is then generated with the following priority, each one acting as a fallback for it's greater:
 
@@ -181,7 +181,7 @@ Toggle whether `Breadcrumbs.svelte` should attempt to import the modules itself.
 
 ## BreadcrumbTitle
 
-Attempts to generate a breadcrumb title by searching the cooresponding route modules for data, or falling back to the data in the route itself.
+Attempts to generate a breadcrumb title by searching the corresponding route modules for data, or falling back to the data in the route itself.
 
 ### Props
 
