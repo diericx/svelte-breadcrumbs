@@ -1,10 +1,16 @@
 # Svelte-Breadcrumbs
 
+- [Usage](#usage)
+  - [Install](#install)
+  - [Setting up the `Breadcrumb` component](#setting-up-the-breadcrumb-component)
+  - [Customizing route titles](#customizing-route-titles)
+- [Component Docs](#full-component-docs)
+
 Svelte-Breadcrumbs makes it easy to generate meaningful breadcrumbs by leveraging Svelte's directory structure and [Module Context Exports](https://learn.svelte.dev/tutorial/module-exports).
 
 For example, when navigating to a route such as `/todos/[id]/edit` with the URL Pathname being `/todos/1/edit` you can immediately generate the breadcrumb `todos > 1 > edit`.
 
-What if you wanted the id to be the name of the todo itself? The crux of this issue lies in the fact that we are currently on the `/todos/[i]/edit` page, so any breadcrumb ui elements generated in `/todos/[i]/+page.svelte` or breadcrumb data returned in `/todos/[id]/+page.server.ts` will not be immediately available. Without some sort of data sharing or higher level organization we will need to manually construct the breadcrumb list for each route.
+Replacing the id `1` with meaningful data such as the todo's `name` proves to be slightly more difficulty. The crux of this issue lies in the fact that we are currently on the `/todos/[id]/edit`page, so any breadcrumb ui elements generated in`/todos/[id]/+page.svelte`or breadcrumb data returned in`/todos/[id]/+page.server.ts` will not be immediately available.
 
 With Svelte-Breadcrumbs, the route id is first split (e.g. `/todos/[id]/edit` -> `['todos', '[id]', 'edit']`) giving us the directory for each route. We then import the `+page.svelte` file from the corresponding directory and access a constant string `pageTitle` or getter function `getPageTitle` that was exported. The getter function is called with the current page's data passed in as a parameter.
 
@@ -35,13 +41,15 @@ In `+layout.svelte`:
 
 ```svelte
 <!--
-Add the `Breadcrumbs` component and feed in the current page url and the route id while grabbing the crumbs variable.
+Add the `Breadcrumbs` component and feed in the current page url
+and the route id while grabbing the crumbs variable.
 -->
 <Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs let:routeModules>
   <div>
     <span><a href="/">Home</a></span>
     <!--
-    Loop over the generated crumbs array and use the `BreadcrumbTitle` component to generate your breadcrumb titles.
+    Loop over the generated crumbs array and use the `BreadcrumbTitle`
+    component to generate your breadcrumb titles.
     -->
     {#each crumbs as c}
       <span>/</span>
