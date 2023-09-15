@@ -14,16 +14,13 @@
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase());
   }
-  export let routeModules: Record<
-    string,
-    (() => Promise<ModuleData>) | ModuleData
-  > = {};
+  export let routeModules: Record<string, ModuleData> | undefined = undefined;
   export let pageData: any;
-  export let shouldImportRouteModules = true;
 
   onMount(async () => {
-    // If enabled, import the modules for all svelte files
-    if (shouldImportRouteModules) {
+    // If nothing is passed to routeModules, populate it
+    if (routeModules === undefined) {
+      routeModules = {};
       const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
       for (const [key, value] of Object.entries(_routeModules)) {
         const module = (await value()) as ModuleData;
@@ -37,7 +34,7 @@
   });
 
   // Given a module and a crumb, determine the page title
-  function getPageTitleFromModule(module: any) {
+  function getPageTitleFromModule(module: ModuleData | undefined) {
     if (module?.pageTitle) {
       return module.pageTitle;
     }
@@ -52,26 +49,37 @@
   $: {
     _crumbs = [] as Crumb[];
     if (crumbs != undefined) {
+      // If crumbs array is passed in always use that with highest priority
       _crumbs = [...crumbs];
     } else if (routeId) {
-      // The next best case would be to parse the source route and import the
-      // page titles from each page.
+      // If there is routeing info, use it to find the page modules and
+      // subsequently the page titles for each route leading up to the
+      // current page.
       let completeUrl = "";
       let completeRoute =
         relPathToRoutes + (relPathToRoutes.slice(-1) == "/" ? "" : "/");
       const routes = routeId.split("/").filter((p) => p != "");
       const paths = url.pathname.split("/").filter((p) => p != "");
 
+      // Loop over each directory in the path and generate a crumb
+      // for each one.
       for (let i = 0; i < paths.length; i++) {
         let path = paths[i];
         let route = routes[i];
         completeUrl += `/${path}`;
+
         // Note: the slash is trailing here because the prefix always exists as the provided
         // relative path to the routes folder, and we are appending another path to
         // the end later
         completeRoute += `${route}/`;
-        const currentSveltePageRoute = `${completeRoute}+page.svelte`;
-        const routeModule = routeModules[currentSveltePageRoute];
+
+        // routeModules type is technically undefined so we can detect when a value
+        // is passed in or not, but will always be generated in the onMount as a
+        // fallback.
+        const routeModule =
+          routeModules === undefined
+            ? undefined
+            : routeModules[`${completeRoute}+page.svelte`];
 
         _crumbs.push({
           // Last crumb gets no url as it is the current page
@@ -79,9 +87,12 @@
           title: getPageTitleFromModule(routeModule) || titleSanitizer(path),
         });
       }
+
       // Force trigger an update
-      _crumbs = [..._crumbs];
+      _crumbs = _crumbs;
     } else {
+      // And if there is no route info, simply generate breadcrumbs from the url
+      // path
       let completeUrl = "";
       const paths = url.pathname.split("/").filter((p) => p != "");
       for (let i = 0; i < paths.length; i++) {
@@ -93,7 +104,7 @@
         });
       }
 
-      _crumbs = [..._crumbs];
+      _crumbs = _crumbs;
     }
   }
 </script>

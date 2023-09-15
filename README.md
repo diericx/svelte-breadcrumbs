@@ -62,14 +62,20 @@ and the route id while grabbing the crumbs variable.
 </Breadcrumbs>
 ```
 
-In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself. You can implement this yourself like so.
+In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself. You can implement this yourself like so. If you pass a value for `routeModules` the `Breadcrumbs` component will not try to populate it. Note that we cannot simply use the value of `glob` as it returns async functions for each route.
 
 ```svelte
 <script lang="ts">
-    const routeModules = import.meta.glob("/src/routes/**/*.svelte");
+  let routeModules: Record<string, ModuleData> = {};
+  onMount(async () => {
+    const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
+    for (const [key, value] of Object.entries(_routeModules)) {
+      routeModules[key] = (await value()) as ModuleData;
+    }
+  })
 </script>
 
-<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs shouldImportRouteModules={false} {routeModules}>
+<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs {routeModules}>
   <!-- ...-->
 </Breadcrumbs>
 ```
@@ -105,6 +111,12 @@ export type Crumb = {
   url?: string; // The URL of this page (e.g. /todos/1/edit)
   route?: string; // The route id of this page (e.g. /todos/[id]/edit)
 };
+
+// The data we will be grabbing from each +page.svelte file
+export type ModuleData = {
+  pageTitle?: string;
+  getPageTitle?: (data: any) => string;
+};
 ```
 
 ## Full Component Docs
@@ -114,6 +126,8 @@ export type Crumb = {
 This component will provide an array of `Crumb`s to a single slot. The final `Crumb` will never have a URL as it is the current page.
 
 ### Props
+
+#### `routeModules: Record<string, ModuleData>`
 
 #### `relPathToRoutes: string`
 
@@ -170,11 +184,3 @@ A list of `Crum`s that will override/bypass any breadcrumb generation via routes
 > Default Value: `(title) => title.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());`
 
 Each title of the generated `Crumb` items will pass through this function. By default it will add spaces and capitalize (e.g. `myTodos` -> `My Todos`).
-
-#### `shouldImportRouteModules`
-
-> Optional
-
-> Default Value: true
-
-Toggle whether `Breadcrumbs.svelte` should attempt to import the modules itself. By default it will run `import.meta.glob("/src/routes/**/*.svelte")` and will evaluate each promise in the `onMount` function, loading them all up front.

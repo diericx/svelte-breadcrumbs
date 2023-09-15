@@ -4,5 +4,5 @@ export type Crumb = {
 };
 export type ModuleData = {
   pageTitle?: string;
-  getPageTitle: (data: any) => string;
+  getPageTitle?: (data: any) => string;
 };
