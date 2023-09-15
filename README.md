@@ -62,7 +62,7 @@ and the route id while grabbing the crumbs variable.
 </Breadcrumbs>
 ```
 
-In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself. You can implement this yourself like so. If you pass a value for `routeModules` the `Breadcrumbs` component will not try to populate it. Note that we cannot simply use the value of `glob` as it returns async functions for each route.
+In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself. You can implement this yourself like so. If you pass a value for `routeModules` the `Breadcrumbs` component will not try to populate it. Note that we cannot simply use the value of `glob` as it returns async functions for each route, so we need to evaluate each entry.
 
 ```svelte
 <script lang="ts">
@@ -129,6 +129,10 @@ This component will provide an array of `Crumb`s to a single slot. The final `Cr
 
 #### `routeModules: Record<string, ModuleData>`
 
+> Optional
+
+The exported data for each module. If not provided it will be populated on mount with `import.meta.glob("/src/routes/**/*.svelte")`.
+
 #### `relPathToRoutes: string`
 
 > Optional
@@ -153,9 +157,9 @@ Thus in order to match that file we need to specify the prefix `/src/routes/`. B
 relPathToRoutes + routeId + "/+page.svelte";
 ```
 
-#### `routeId: string | null`
+#### `routeId: string | null | undefined`
 
-> Required
+> Optional
 
 Route id for the current page. In Sveltekit this is `$page.route.id`.
 
