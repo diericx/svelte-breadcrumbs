@@ -48,18 +48,13 @@ and the route id while grabbing the crumbs variable.
   <div>
     <span><a href="/">Home</a></span>
     <!--
-    Loop over the generated crumbs array and use the `BreadcrumbTitle`
-    component to generate your breadcrumb titles.
+    Loop over the generated crumbs array
     -->
     {#each crumbs as c}
       <span>/</span>
       <span>
         <a href={c.url}>
-          <!--
-          Pass in the glob import of the route svelte modules as well as
-          any page data to pass through to the getter functions.
-          -->
-          <BreadcrumbTitle pageData={$page.data} {routeModules} crumb={c} />
+          {c.title}
         </a>
       </span>
     {/each}
@@ -67,35 +62,26 @@ and the route id while grabbing the crumbs variable.
 </Breadcrumbs>
 ```
 
-In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself. You can implement this yourself and can even lazy load if you'd like as the components support both functions and objects for the module values.
+In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself. You can implement this yourself like so.
 
 ```svelte
 <script lang="ts">
-    // Each route exists in this object as an async function. By providing
-    // this object to BreadcrumbTitle it will lazy import the modules.
-    // To make it more clear, this is the type returned by glob:
-    //
-    // Record<string, () => Promise<unknown>>
-    //
-    // Remember to disable module importing on the Breadcrumbs component though!
     const routeModules = import.meta.glob("/src/routes/**/*.svelte");
 </script>
 
-<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs shouldImportRouteModules={false}>
-  <!-- ...-->
-      <BreadcrumbTitle pageData={$page.data} {routeModules} crumb={c} />
+<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs shouldImportRouteModules={false} {routeModules}>
   <!-- ...-->
 </Breadcrumbs>
 ```
 
 ### Customizing route titles
 
-The `BreadcrumbTitle` component will have access to your Svlete components based on the route id and will be looking for the following exported variables in the [Module Context](https://learn.svelte.dev/tutorial/module-exports):
+The `Breadcrumbs` component will have access to your Svelte components based on the route id and will be looking for the following exported variables in the [Module Context](https://learn.svelte.dev/tutorial/module-exports):
 
 - `pageTitle: string`
 - `getPageTitle: (data: any) -> string`
 
-`getPageTitle` will receive the value of `$page.data` passed through (see the `BreadcrumbTitle` usage above).
+`getPageTitle` will receive the value of `$page.data` passed through in the `Breadcrumbs` prop. (see the `Breadcrumbs` usage above).
 
 Here is an example:
 
@@ -165,6 +151,12 @@ Route id for the current page. In Sveltekit this is `$page.route.id`.
 
 URL for the current page. Used to generate the url that each breadcrumb should link to when clicked on. In SvelteKit this is `$page.url`.
 
+#### `pageData: any`
+
+> Optional
+
+Page Data to pass through to the `getPageTitle` function living in a route's `page.svelte` file
+
 #### `crumbs: Crumb[]`
 
 > Optional
@@ -186,21 +178,3 @@ Each title of the generated `Crumb` items will pass through this function. By de
 > Default Value: true
 
 Toggle whether `Breadcrumbs.svelte` should attempt to import the modules itself. By default it will run `import.meta.glob("/src/routes/**/*.svelte")` and will evaluate each promise in the `onMount` function, loading them all up front.
-
-## BreadcrumbTitle
-
-Attempts to generate a breadcrumb title by searching the corresponding route modules for data, or falling back to the data in the route itself.
-
-### Props
-
-`crumb: Crumb`
-
-The crumby little item to be rendered. See the type above.
-
-`routeModules: Record<string, () => Promise<unknown>>`
-
-The files imported via a glob pattern (`import.meta.glob(path: string)`)
-
-`pageData: any`
-
-Page Data to pass through to the `getPageTitle` function living in a route's `page.svelte` file
