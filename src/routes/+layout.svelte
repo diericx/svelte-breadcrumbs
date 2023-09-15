@@ -1,14 +1,13 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
-  import BreadcrumbTitle from "$lib/components/BreadcrumbTitle.svelte";
 </script>
 
 <Breadcrumbs
   url={$page.url}
   routeId={$page.route.id}
+  pageData={$page.data}
   let:crumbs
-  let:routeModules
 >
   <div>
     <span><a href="/">Home</a></span>
@@ -20,7 +19,7 @@
           Pass in the glob import of the route svelte modules as well as
           any data the routes can use to try to fill in any info.
           -->
-          <BreadcrumbTitle pageData={$page.data} {routeModules} crumb={c} />
+          {c.title}
         </a>
       </span>
     {/each}

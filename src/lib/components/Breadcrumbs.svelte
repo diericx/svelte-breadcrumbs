@@ -18,6 +18,7 @@
     string,
     (() => Promise<ModuleData>) | ModuleData
   > = {};
+  export let pageData: any;
   export let shouldImportRouteModules = true;
 
   onMount(async () => {
@@ -34,6 +35,18 @@
       }
     }
   });
+
+  // Given a module and a crumb, determine the page title
+  function getPageTitleFromModule(module: any) {
+    if (module?.pageTitle) {
+      return module.pageTitle;
+    }
+    // Fall back to crumb title if the function returns undefined
+    if (module?.getPageTitle) {
+      return module.getPageTitle(pageData);
+    }
+    return undefined;
+  }
 
   let _crumbs = [] as Crumb[];
   $: {
@@ -57,12 +70,13 @@
         // relative path to the routes folder, and we are appending another path to
         // the end later
         completeRoute += `${route}/`;
+        const currentSveltePageRoute = `${completeRoute}+page.svelte`;
+        const routeModule = routeModules[currentSveltePageRoute];
 
         _crumbs.push({
           // Last crumb gets no url as it is the current page
           url: i == paths.length - 1 ? undefined : completeUrl,
-          route: completeRoute + "+page.svelte",
-          title: titleSanitizer(path),
+          title: getPageTitleFromModule(routeModule) || titleSanitizer(path),
         });
       }
       // Force trigger an update
