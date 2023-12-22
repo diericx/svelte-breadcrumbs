@@ -1,112 +1,121 @@
 <script lang="ts">
-  import type { Crumb } from "$lib/crumb.js";
-  import type { ModuleData } from "$lib/types.js";
-  import { onMount } from "svelte";
+import type { Crumb } from "$lib/types.ts";
+import type { ModuleData } from "$lib/types.ts";
+import { browser } from "$app/environment";
+import { onMount } from "svelte";
 
-  // Relative path to the routes folder for the glob import
-  export let relPathToRoutes: string = "/src/routes/";
-  // The route from the routers perspective, e.g. $page.route.id
-  export let routeId: string | null;
-  export let url: URL;
-  export let crumbs: Crumb[] | undefined = undefined;
-  export function titleSanitizer(title: string) {
+// Relative path to the routes folder for the glob import
+export let relPathToRoutes: string = "/src/routes/";
+
+// The route from the routers perspective, e.g. $page.route.id
+export let routeId: string | null;
+
+export let url: URL;
+export let crumbs: Crumb[] | undefined = undefined;
+export let titleSanitizer = (title: string): string => {
     return title
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase());
-  }
-  export let routeModules: Record<string, ModuleData> | undefined = undefined;
-  export let pageData: any;
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase());
+};
+export let routeModules: Record<string, ModuleData> | undefined =
+    undefined;
+export let pageData: any;
 
-  onMount(async () => {
+onMount(async () => {
     // If nothing is passed to routeModules, populate it
     if (routeModules === undefined) {
-      routeModules = {};
-      const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
-      for (const [key, value] of Object.entries(_routeModules)) {
-        const module = (await value()) as ModuleData;
-        // Only store the info we need to cut down on memory usage
-        routeModules[key] = {
-          pageTitle: module.pageTitle,
-          getPageTitle: module.getPageTitle,
-        };
-      }
+        routeModules = {};
+        const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
+        for (const [key, value] of Object.entries(_routeModules)) {
+            const module = (await value()) as ModuleData;
+            // Only store the info we need to cut down on memory usage
+            routeModules[key] = {
+                pageTitle: module.pageTitle,
+                getPageTitle: module.getPageTitle,
+            };
+        }
     }
-  });
+});
 
-  // Given a module and a crumb, determine the page title
-  function getPageTitleFromModule(module: ModuleData | undefined) {
+// Given a module and a crumb, determine the page title
+function getPageTitleFromModule(module: ModuleData | undefined) {
     if (module?.pageTitle) {
-      return module.pageTitle;
+        return module.pageTitle;
     }
     // Fall back to crumb title if the function returns undefined
     if (module?.getPageTitle) {
-      return module.getPageTitle(pageData);
+        return module.getPageTitle(pageData);
     }
     return undefined;
-  }
+}
 
-  let _crumbs = [] as Crumb[];
-  $: {
+let _crumbs = [] as Crumb[];
+$: {
     _crumbs = [] as Crumb[];
     if (crumbs != undefined) {
-      // If crumbs array is passed in always use that with highest priority
-      _crumbs = [...crumbs];
+        // If crumbs array is passed in always use that with highest priority
+        _crumbs = [...crumbs];
     } else if (routeId) {
-      // If there is routeing info, use it to find the page modules and
-      // subsequently the page titles for each route leading up to the
-      // current page.
-      let completeUrl = "";
-      let completeRoute =
-        relPathToRoutes + (relPathToRoutes.slice(-1) == "/" ? "" : "/");
-      const routes = routeId.split("/").filter((p) => p != "");
-      const paths = url.pathname.split("/").filter((p) => p != "");
+        // If there is routeing info, use it to find the page modules and
+        // subsequently the page titles for each route leading up to the
+        // current page.
+        let completeUrl = "";
+        let completeRoute =
+            relPathToRoutes +
+            (relPathToRoutes.slice(-1) == "/" ? "" : "/");
+        const routes = routeId.split("/").filter((p) => p != "");
+        const paths = url.pathname.split("/").filter((p) => p != "");
 
-      // Loop over each directory in the path and generate a crumb
-      // for each one.
-      for (let i = 0; i < paths.length; i++) {
-        let path = paths[i];
-        let route = routes[i];
-        completeUrl += `/${path}`;
+        // Loop over each directory in the path and generate a crumb
+        // for each one.
+        for (let i = 0; i < paths.length; i++) {
+            let path = paths[i];
+            let route = routes[i];
+            completeUrl += `/${path}`;
 
-        // Note: the slash is trailing here because the prefix always exists as the provided
-        // relative path to the routes folder, and we are appending another path to
-        // the end later
-        completeRoute += `${route}/`;
+            // Note: the slash is trailing here because the prefix always exists as the provided
+            // relative path to the routes folder, and we are appending another path to
+            // the end later
+            completeRoute += `${route}/`;
 
-        // routeModules type is technically undefined so we can detect when a value
-        // is passed in or not, but will always be generated in the onMount as a
-        // fallback.
-        const routeModule =
-          routeModules === undefined
-            ? undefined
-            : routeModules[`${completeRoute}+page.svelte`];
+            // routeModules type is technically undefined so we can detect when a value
+            // is passed in or not, but will always be generated in the onMount as a
+            // fallback.
+            const routeModule =
+                routeModules === undefined
+                    ? undefined
+                    : routeModules[`${completeRoute}+page.svelte`];
 
-        _crumbs.push({
-          // Last crumb gets no url as it is the current page
-          url: i == paths.length - 1 ? undefined : completeUrl,
-          title: getPageTitleFromModule(routeModule) || titleSanitizer(path),
-        });
-      }
+            _crumbs.push({
+                // Last crumb gets no url as it is the current page
+                url: i == paths.length - 1 ? undefined : completeUrl,
+                title:
+                    getPageTitleFromModule(routeModule) ||
+                    titleSanitizer(path),
+            });
+        }
 
-      // Force trigger an update
-      _crumbs = _crumbs;
+        // Force trigger an update
+        _crumbs = _crumbs;
     } else {
-      // And if there is no route info, simply generate breadcrumbs from the url
-      // path
-      let completeUrl = "";
-      const paths = url.pathname.split("/").filter((p) => p != "");
-      for (let i = 0; i < paths.length; i++) {
-        let path = paths[i];
-        completeUrl += `/${path}`;
-        _crumbs.push({
-          title: titleSanitizer(path),
-          url: i == paths.length - 1 ? undefined : completeUrl,
-        });
-      }
+        // And if there is no route info, simply generate breadcrumbs from the url
+        // path
+        let completeUrl = "";
+        const paths = url.pathname.split("/").filter((p) => p != "");
+        for (let i = 0; i < paths.length; i++) {
+            let path = paths[i];
+            completeUrl += `/${path}`;
+            _crumbs.push({
+                title: titleSanitizer(path),
+                url: i == paths.length - 1 ? undefined : completeUrl,
+            });
+        }
 
-      _crumbs = _crumbs;
+        _crumbs = _crumbs;
     }
-  }
+}
 </script>
 
-<slot crumbs={_crumbs} {routeModules} />
+{#if browser}
+    <slot crumbs={_crumbs} routeModules={routeModules} />
+{/if}
