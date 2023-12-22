@@ -171,7 +171,7 @@ URL for the current page. Used to generate the url that each breadcrumb should l
 
 #### `pageData: any`
 
-> Optional
+> Required
 
 Page Data to pass through to the `getPageTitle` function living in a route's `page.svelte` file
 
