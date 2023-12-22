@@ -44,7 +44,13 @@ In `+layout.svelte`:
 Add the `Breadcrumbs` component and feed in the current page url
 and the route id while grabbing the crumbs variable.
 -->
-<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs let:routeModules>
+<Breadcrumbs
+  url={$page.url}
+  routeId={$page.route.id}
+  pageData={$page.data}
+  let:crumbs
+>
+
   <div>
     <span><a href="/">Home</a></span>
     <!--
