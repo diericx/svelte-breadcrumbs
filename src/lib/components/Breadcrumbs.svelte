@@ -1,10 +1,9 @@
 <script lang="ts">
-  import type { Crumb } from "$lib/crumb.js";
-  import type { ModuleData } from "$lib/types.js";
+  import type { Crumb, ModuleData } from "$lib/types.js";
   import { onMount } from "svelte";
 
   // Relative path to the routes folder for the glob import
-  export let relPathToRoutes: string = "/src/routes/";
+  export let relPathToRoutes: string = "./src/routes/";
   // The route from the routers perspective, e.g. $page.route.id
   export let routeId: string | null;
   export let url: URL;
