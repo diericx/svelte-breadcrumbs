@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
 
   // Relative path to the routes folder for the glob import
-  export let relPathToRoutes: string = "./src/routes/";
+  export let relPathToRoutes: string = "/src/routes/";
   // The route from the routers perspective, e.g. $page.route.id
   export let routeId: string | null;
   export let url: URL;
@@ -20,7 +20,7 @@
     // If nothing is passed to routeModules, populate it
     if (routeModules === undefined) {
       routeModules = {};
-      const _routeModules = import.meta.glob("./src/routes/**/*.svelte");
+      const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
       for (const [key, value] of Object.entries(_routeModules)) {
         const module = (await value()) as ModuleData;
         // Only store the info we need to cut down on memory usage
