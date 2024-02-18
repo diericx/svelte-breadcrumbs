@@ -1,4 +1,4 @@
-<script lang="ts" generics="Metadata">
+<script lang="ts" generics="Metadata = any">
   import type { Crumb, ModuleData } from "$lib/types.js";
   import { onMount } from "svelte";
 
