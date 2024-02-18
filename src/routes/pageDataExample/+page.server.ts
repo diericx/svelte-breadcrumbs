@@ -6,12 +6,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     {
       title: "Page 1",
       url: "/",
-      metadata: "hello",
     },
     {
       title: "Page 2",
       url: "/",
-      metadata: "world",
     },
   ];
   return {
