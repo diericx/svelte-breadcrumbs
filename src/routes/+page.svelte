@@ -2,4 +2,5 @@
 
 <ul>
   <li><a href="/todos">Todos</a></li>
+  <li><a href="/pageDataExample">Page Data Example</a></li>
 </ul>

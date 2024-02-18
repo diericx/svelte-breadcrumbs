@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="CrumbGeneric extends Crumb">
   import type { Crumb, ModuleData } from "$lib/types.js";
   import { onMount } from "svelte";
 
@@ -7,7 +7,7 @@
   // The route from the routers perspective, e.g. $page.route.id
   export let routeId: string | null;
   export let url: URL;
-  export let crumbs: Crumb[] | undefined = undefined;
+  export let crumbs: CrumbGeneric[] | undefined = undefined;
   export function titleSanitizer(title: string) {
     return title
       .replace(/([A-Z])/g, " $1")
@@ -44,9 +44,9 @@
     return undefined;
   }
 
-  let _crumbs = [] as Crumb[];
+  let _crumbs = [] as CrumbGeneric[];
   $: {
-    _crumbs = [] as Crumb[];
+    _crumbs = [] as CrumbGeneric[];
     if (crumbs != undefined) {
       // If crumbs array is passed in always use that with highest priority
       _crumbs = [...crumbs];
@@ -84,7 +84,7 @@
           // Last crumb gets no url as it is the current page
           url: i == paths.length - 1 ? undefined : completeUrl,
           title: getPageTitleFromModule(routeModule) || titleSanitizer(path),
-        });
+        } as CrumbGeneric);
       }
 
       // Force trigger an update
@@ -100,7 +100,7 @@
         _crumbs.push({
           title: titleSanitizer(path),
           url: i == paths.length - 1 ? undefined : completeUrl,
-        });
+        } as CrumbGeneric);
       }
 
       _crumbs = _crumbs;
