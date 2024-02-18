@@ -25,7 +25,7 @@
           any data the routes can use to try to fill in any info.
           -->
           {c.title}
-          {c.metadata ? `(${c.metadata.extraValue1})` : ""}
+          {c.metadata ? `(${c.metadata.extraValue})` : ""}
         </a>
       </span>
     {/each}
