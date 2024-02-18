@@ -10,13 +10,12 @@ export const load: PageServerLoad = async ({ params }) => {
         description: "Here is a description of my first todo",
       },
     };
-  } else if (id == "2") {
-    return {
-      todo: {
-        id: 2,
-        name: "My Second Todo",
-        description: "Here is a description of my second todo",
-      },
-    };
   }
+  return {
+    todo: {
+      id: 2,
+      name: "My Second Todo",
+      description: "Here is a description of my second todo",
+    },
+  };
 };
