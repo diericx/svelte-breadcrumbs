@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="Metadata = any">
   import type { Crumb, ModuleData } from "$lib/types.js";
   import { onMount } from "svelte";
 
@@ -7,7 +7,7 @@
   // The route from the routers perspective, e.g. $page.route.id
   export let routeId: string | null;
   export let url: URL;
-  export let crumbs: Crumb[] | undefined = undefined;
+  export let crumbs: Crumb<Metadata>[] | undefined = undefined;
   export function titleSanitizer(title: string) {
     return title
       .replace(/([A-Z])/g, " $1")
@@ -44,9 +44,9 @@
     return undefined;
   }
 
-  let _crumbs = [] as Crumb[];
+  let _crumbs = [] as Crumb<Metadata>[];
   $: {
-    _crumbs = [] as Crumb[];
+    _crumbs = [] as Crumb<Metadata>[];
     if (crumbs != undefined) {
       // If crumbs array is passed in always use that with highest priority
       _crumbs = [...crumbs];

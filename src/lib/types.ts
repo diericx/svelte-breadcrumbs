@@ -1,6 +1,7 @@
-export type Crumb = {
+export type Crumb<M = any> = {
   title?: string;
   url?: string;
+  metadata?: M;
 };
 export type ModuleData = {
   pageTitle?: string;

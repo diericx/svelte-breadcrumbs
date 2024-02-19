@@ -1,12 +1,17 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import type { Crumb } from "$lib";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
+  import type { MyCrumbMetadata } from "./types";
+
+  $: pageDataCrumbs = $page.data.crumbs as Crumb<MyCrumbMetadata>[] | undefined;
 </script>
 
 <Breadcrumbs
   url={$page.url}
   routeId={$page.route.id}
   pageData={$page.data}
+  crumbs={pageDataCrumbs}
   let:crumbs
 >
   <div>
@@ -20,6 +25,7 @@
           any data the routes can use to try to fill in any info.
           -->
           {c.title}
+          {c.metadata ? `(${c.metadata.extraValue})` : ""}
         </a>
       </span>
     {/each}
