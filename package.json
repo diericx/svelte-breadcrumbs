@@ -1,6 +1,6 @@
 {
   "name": "svelte-breadcrumbs",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run package",

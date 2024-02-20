@@ -62,20 +62,27 @@ and the route id while grabbing the crumbs variable.
 </Breadcrumbs>
 ```
 
-In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself. You can implement this yourself like so. If you pass a value for `routeModules` the `Breadcrumbs` component will not try to populate it. Note that we cannot simply use the value of `glob` as it returns async functions for each route, so we need to evaluate each entry.
+In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself under the assumption that all Svelte files exist in `/src/routes/`. If your directory structure is different, you can implement this yourself. If you pass a value for `routeModules` the `Breadcrumbs` component will not try to populate it. You will also need to update the path prefix for your Svelte directory.
 
 ```svelte
 <script lang="ts">
-  let routeModules: Record<string, ModuleData> = {};
+  $: routeModules = {} as Record<string, ModuleData>;
+
   onMount(async () => {
-    const _routeModules = import.meta.glob("/src/routes/**/*.svelte");
-    for (const [key, value] of Object.entries(_routeModules)) {
-      routeModules[key] = (await value()) as ModuleData;
-    }
+    // Note: that the path prefix here is now /src/svelte/
+    // Note: eager is required
+    routeModules = import.meta.glob("/src/svelte/**/*.svelte", {eager: true});
   })
 </script>
 
-<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs {routeModules}>
+<!-- Note: routeModules and globImportPrefix passed through -->
+<Breadcrumbs
+  url={$page.url}
+  routeId={$page.route.id}
+  {routeModules}
+  globImportPrefix={'/src/svelte/'}
+  let:crumbs
+>
   <!-- ...-->
 </Breadcrumbs>
 ```
@@ -109,7 +116,7 @@ Here is an example:
 export type Crumb = {
   title?: string; // The default title being the sanitized page inferred from the URL (e.g. Edit)
   url?: string; // The URL of this page (e.g. /todos/1/edit)
-  route?: string; // The route id of this page (e.g. /todos/[id]/edit)
+  metadata?: any; // Any metadata you want passed through to the Breadcrumbs component
 };
 
 // The data we will be grabbing from each +page.svelte file
@@ -131,7 +138,14 @@ This component will provide an array of `Crumb`s to a single slot. The final `Cr
 
 > Optional
 
-The exported data for each module. If not provided it will be populated on mount with `import.meta.glob("/src/routes/**/*.svelte")`.
+The exported data for each module. If not provided it will be populated on mount with an eager glob import of `"/src/routes/**/*.svelte"` which is SvelteKit specific.
+
+Completely disable this feature by passing in an empty value as shown below.
+
+````svelte
+<Breadcrumbs routeModules={{}}>
+  <!-- ...-->
+</Breadcrumbs>
 
 #### `relPathToRoutes: string`
 
@@ -139,7 +153,7 @@ The exported data for each module. If not provided it will be populated on mount
 
 > Default Value: `'/src/routes/'`
 
-The path to the `routes/` folder relative to how it was imported. For example, if we are on a route `/todo/[id]/` and we have imported the svelte files like so:
+The path to the directory where your Svelte files live. In SvelteKit, if we are on a route `/todo/[id]/` and we have imported the svelte files like so:
 
 `import.meta.glob("/src/routes/**/*.svelte")`
 
@@ -149,12 +163,14 @@ it will produce an object with the following:
 {
   '/src/routes/todo/[id]/+page.svelte': ...Promise obj...
 }
-```
+````
 
-Thus in order to match that file we need to specify the prefix `/src/routes/`. Breadcrumbs.svelte will essentially do the following to generate a path to the `+page.svelte` file:
+Thus in order to match that file we need to specify the prefix `/src/routes/`. `Breadcrumbs.svelte` will essentially do the following to generate a path to the `+page.svelte` file:
 
 ```js
 relPathToRoutes + routeId + "/+page.svelte";
+```
+
 ```
 
 #### `routeId: string | null | undefined`
@@ -188,3 +204,4 @@ A list of `Crum`s that will override/bypass any breadcrumb generation via routes
 > Default Value: `(title) => title.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());`
 
 Each title of the generated `Crumb` items will pass through this function. By default it will add spaces and capitalize (e.g. `myTodos` -> `My Todos`).
+```
