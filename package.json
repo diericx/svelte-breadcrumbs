@@ -1,6 +1,6 @@
 {
   "name": "svelte-breadcrumbs",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run package",
@@ -24,10 +24,8 @@
   "peerDependencies": {
     "svelte": "3.x || 4.x"
   },
-  "dependencies": {
-    "@sveltejs/kit": "1.24.0"
-  },
   "devDependencies": {
+    "@sveltejs/kit": "1.24.0",
     "@sveltejs/adapter-auto": "2.1.0",
     "@sveltejs/package": "2.2.2",
     "publint": "0.1.16",
