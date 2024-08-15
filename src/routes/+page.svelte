@@ -6,4 +6,5 @@
   <li>
     <a href="/pageDataExample/metadataExample">Crumb Metadata Example</a>
   </li>
+  <li><a href="/groupedRoute">Route Groups Example</a></li>
 </ul>
