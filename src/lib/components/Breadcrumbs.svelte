@@ -50,7 +50,12 @@
       let completeUrl = "";
       let completeRoute =
         relPathToRoutes + (relPathToRoutes.slice(-1) == "/" ? "" : "/");
-      const routes = routeId.split("/").filter((p) => p != "");
+      // Split the route ID on every forward slash, but if there is a group route include that in the
+      // following route. This accounts for the fact that (group) routes do not show up in the path.
+      // For Example:
+      // routeId: test/(group1)/test2/test3
+      // routes: ["test", "(group1)/test2", "test3"]
+      const routes = routeId.split(/(?<!\))\//).filter((p) => p != "");
       const paths = url.pathname.split("/").filter((p) => p != "");
 
       // Loop over each directory in the path and generate a crumb
