@@ -2,9 +2,10 @@
   import { page } from "$app/stores";
   import type { Crumb } from "$lib";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
+  import type { Snippet } from "svelte";
   import type { MyCrumbMetadata } from "./types";
   interface Props {
-    children?: import('svelte').Snippet;
+    children?: Snippet;
   }
 
   let { children }: Props = $props();
