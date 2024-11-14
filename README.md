@@ -144,10 +144,11 @@ The exported data for each module. If not provided it will be populated on mount
 
 Completely disable this feature by passing in an empty value as shown below.
 
-````svelte
+```svelte
 <Breadcrumbs routeModules={{}}>
   <!-- ...-->
 </Breadcrumbs>
+```
 
 #### `relPathToRoutes: string`
 
@@ -165,14 +166,12 @@ it will produce an object with the following:
 {
   '/src/routes/todo/[id]/+page.svelte': ...Promise obj...
 }
-````
+```
 
 Thus in order to match that file we need to specify the prefix `/src/routes/`. `Breadcrumbs.svelte` will essentially do the following to generate a path to the `+page.svelte` file:
 
 ```js
 relPathToRoutes + routeId + "/+page.svelte";
-```
-
 ```
 
 #### `routeId: string | null | undefined`
@@ -206,4 +205,3 @@ A list of `Crumb`s that will override/bypass any breadcrumb generation via route
 > Default Value: `(title) => title.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());`
 
 Each title of the generated `Crumb` items will pass through this function. By default it will add spaces and capitalize (e.g. `myTodos` -> `My Todos`).
-```
