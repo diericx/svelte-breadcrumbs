@@ -1,20 +1,34 @@
 <script lang="ts" generics="Metadata = any">
   import type { Crumb, ModuleData } from "$lib/types.js";
-  import { onMount } from "svelte";
+  import { type Snippet, onMount } from "svelte";
 
-  // Relative path to the routes folder for the glob import
-  export let relPathToRoutes: string = "/src/routes/";
-  // The route from the routers perspective, e.g. $page.route.id
-  export let routeId: string | null;
-  export let url: URL;
-  export let crumbs: Crumb<Metadata>[] | undefined = undefined;
   export function titleSanitizer(title: string) {
     return title
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase());
   }
-  export let routeModules: Record<string, ModuleData> | undefined = undefined;
-  export let pageData: any;
+
+  interface Props {
+    // Relative path to the routes folder for the glob import
+    relPathToRoutes?: string;
+    // The route from the routers perspective, e.g. $page.route.id
+    routeId: string | null;
+    url: URL;
+    crumbs?: Crumb<Metadata>[];
+    routeModules?: Record<string, ModuleData>;
+    pageData: any;
+    children?: Snippet<[any]>;
+  }
+
+  let {
+    relPathToRoutes = "/src/routes/",
+    routeId,
+    url,
+    crumbs = undefined,
+    routeModules = $bindable(undefined),
+    pageData,
+    children
+  }: Props = $props();
 
   onMount(async () => {
     // If nothing is passed to routeModules, populate it
@@ -37,14 +51,13 @@
     return undefined;
   }
 
-  let _crumbs = [] as Crumb<Metadata>[];
-  $: {
-    _crumbs = [] as Crumb<Metadata>[];
+  let _crumbs = $derived.by(() => {
+    let tmpCrumbs = [] as Crumb<Metadata>[];
     if (crumbs != undefined) {
       // If crumbs array is passed in always use that with highest priority
-      _crumbs = [...crumbs];
+      return crumbs;
     } else if (routeId) {
-      // If there is routeing info, use it to find the page modules and
+      // If there is routing info, use it to find the page modules and
       // subsequently the page titles for each route leading up to the
       // current page.
       let completeUrl = "";
@@ -78,15 +91,12 @@
             ? undefined
             : routeModules[`${completeRoute}+page.svelte`];
 
-        _crumbs.push({
+        tmpCrumbs.push({
           // Last crumb gets no url as it is the current page
           url: i == paths.length - 1 ? undefined : completeUrl,
           title: getPageTitleFromModule(routeModule) || titleSanitizer(path),
         });
       }
-
-      // Force trigger an update
-      _crumbs = _crumbs;
     } else {
       // And if there is no route info, simply generate breadcrumbs from the url
       // path
@@ -95,15 +105,14 @@
       for (let i = 0; i < paths.length; i++) {
         let path = paths[i];
         completeUrl += `/${path}`;
-        _crumbs.push({
+        tmpCrumbs.push({
           title: titleSanitizer(path),
           url: i == paths.length - 1 ? undefined : completeUrl,
         });
       }
-
-      _crumbs = _crumbs;
     }
-  }
+    return tmpCrumbs;
+  });
 </script>
 
-<slot crumbs={_crumbs} {routeModules} />
+{@render children?.({ crumbs: _crumbs, routeModules, })}

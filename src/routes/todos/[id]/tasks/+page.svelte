@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
   // You can also set the page title with a const
   export const pageTitle = "The Tasks";
 </script>

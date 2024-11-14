@@ -42,31 +42,33 @@ In `+layout.svelte`:
 ```svelte
 <!--
 Add the `Breadcrumbs` component and feed in the current page url
-and the route id while grabbing the crumbs variable.
+and the route id.
 -->
-<Breadcrumbs url={$page.url} routeId={$page.route.id} let:crumbs let:routeModules>
-  <div>
-    <span><a href="/">Home</a></span>
-    <!--
-    Loop over the generated crumbs array
-    -->
-    {#each crumbs as c}
-      <span>/</span>
-      <span>
-        <a href={c.url}>
-          {c.title}
-        </a>
-      </span>
-    {/each}
-  </div>
+<Breadcrumbs url={$page.url} routeId={$page.route.id}>
+  {#snippet children({ crumbs })}
+    <div>
+      <span><a href="/">Home</a></span>
+      <!--
+      Loop over the generated crumbs array
+      -->
+      {#each crumbs as c}
+        <span>/</span>
+        <span>
+          <a href={c.url}>
+            {c.title}
+          </a>
+        </span>
+      {/each}
+    </div>
+  {/snippet}
 </Breadcrumbs>
 ```
 
-In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself under the assumption that all Svelte files exist in `/src/routes/`. If your directory structure is different, you can implement this yourself. If you pass a value for `routeModules` the `Breadcrumbs` component will not try to populate it. You will also need to update the path prefix for your Svelte directory.
+In the example above, `Breadcrumbs.svelte` will handle grabbing all of the modules itself under the assumption that all Svelte files exist in `/src/routes/`. If your directory structure is different, you can implement this yourself. If you pass a value in the `routeModules` prop the `Breadcrumbs` component will not try to populate it. You will also need to update the path prefix for your Svelte directory.
 
 ```svelte
 <script lang="ts">
-  $: routeModules = {} as Record<string, ModuleData>;
+  let routeModules = $state({} as Record<string, ModuleData>);
 
   onMount(async () => {
     // Note: that the path prefix here is now /src/svelte/
@@ -99,7 +101,7 @@ The `Breadcrumbs` component will have access to your Svelte components based on 
 Here is an example:
 
 ```svelte
-<script context="module" lang="ts">
+<script module lang="ts">
   // Getter function
   export function getPageTitle(data: any) {
     // When this is undefined it will fall back to the value in the route (in this case the todo id for the route /todos/1/edit)
@@ -195,7 +197,7 @@ Page Data to pass through to the `getPageTitle` function living in a route's `pa
 
 > Optional
 
-A list of `Crum`s that will override/bypass any breadcrumb generation via routes. In SvelteKit if you pass `$page.data.crumbs` or something similar you will be able to override any bread crumbs via page loads.
+A list of `Crumb`s that will override/bypass any breadcrumb generation via routes. In SvelteKit if you pass `$page.data.crumbs` or something similar you will be able to override any bread crumbs via page loads.
 
 #### `titleSanitizer(title: string) -> string`
 
