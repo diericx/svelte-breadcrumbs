@@ -198,7 +198,7 @@ Page Data to pass through to the `getPageTitle` function living in a route's `pa
 
 A list of `Crumb`s that will override/bypass any breadcrumb generation via routes. In SvelteKit if you pass `$page.data.crumbs` or something similar you will be able to override any bread crumbs via page loads.
 
-#### `shouldSkipCrumbsForRoutesWithNoPage: bool`
+#### `skipRoutesWithNoPage: bool`
 
 > Optional
 

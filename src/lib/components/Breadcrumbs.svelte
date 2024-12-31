@@ -18,7 +18,7 @@
     routeModules?: Record<string, ModuleData>;
     pageData: any;
     children?: Snippet<[any]>;
-    shouldSkipCrumbsForRoutesWithNoPage: boolean;
+    skipRoutesWithNoPage: boolean;
   }
 
   let {
@@ -28,8 +28,8 @@
     crumbs = undefined,
     routeModules = $bindable(undefined),
     pageData,
-    shouldSkipCrumbsForRoutesWithNoPage,
-    children
+    skipRoutesWithNoPage,
+    children,
   }: Props = $props();
 
   onMount(async () => {
@@ -103,8 +103,8 @@
         // Don't show a breadcrumb if there is no page for the route
         if (routeModule == undefined) {
           url = undefined;
-          if (shouldSkipCrumbsForRoutesWithNoPage) {
-            continue
+          if (skipRoutesWithNoPage) {
+            continue;
           }
         }
 
@@ -132,4 +132,4 @@
   });
 </script>
 
-{@render children?.({ crumbs: _crumbs, routeModules, })}
+{@render children?.({ crumbs: _crumbs, routeModules })}
