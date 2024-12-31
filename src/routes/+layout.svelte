@@ -18,7 +18,6 @@
   routeId={$page.route.id}
   pageData={$page.data}
   crumbs={pageDataCrumbs}
-  
 >
   {#snippet children({ crumbs })}
     <div>

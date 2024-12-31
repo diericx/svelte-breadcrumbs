@@ -18,6 +18,7 @@
     routeModules?: Record<string, ModuleData>;
     pageData: any;
     children?: Snippet<[any]>;
+    skipRoutesWithNoPage: boolean;
   }
 
   let {
@@ -27,7 +28,8 @@
     crumbs = undefined,
     routeModules = $bindable(undefined),
     pageData,
-    children
+    skipRoutesWithNoPage,
+    children,
   }: Props = $props();
 
   onMount(async () => {
@@ -91,9 +93,24 @@
             ? undefined
             : routeModules[`${completeRoute}+page.svelte`];
 
+        let url: string | undefined = completeUrl;
+
+        // Don't show a link for the breadcrumb representing the current page
+        if (i == paths.length - 1) {
+          url = undefined;
+        }
+
+        // Don't show a breadcrumb if there is no page for the route
+        if (routeModule == undefined) {
+          url = undefined;
+          if (skipRoutesWithNoPage) {
+            continue;
+          }
+        }
+
         tmpCrumbs.push({
           // Last crumb gets no url as it is the current page
-          url: i == paths.length - 1 ? undefined : completeUrl,
+          url,
           title: getPageTitleFromModule(routeModule) || titleSanitizer(path),
         });
       }
@@ -115,4 +132,4 @@
   });
 </script>
 
-{@render children?.({ crumbs: _crumbs, routeModules, })}
+{@render children?.({ crumbs: _crumbs, routeModules })}
