@@ -18,7 +18,7 @@
     routeModules?: Record<string, ModuleData>;
     pageData: any;
     children?: Snippet<[any]>;
-    skipRoutesWithNoPage: boolean;
+    skipRoutesWithNoPage?: boolean;
   }
 
   let {
@@ -28,7 +28,7 @@
     crumbs = undefined,
     routeModules = $bindable(undefined),
     pageData,
-    skipRoutesWithNoPage,
+    skipRoutesWithNoPage = false,
     children,
   }: Props = $props();
 
